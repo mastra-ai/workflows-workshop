@@ -1,8 +1,13 @@
-import { Step, Workflow } from '@mastra/core/workflows'
+import { init } from '@mastra/inngest'
+import { Inngest } from 'inngest'
 import { z } from 'zod'
 
-import { createWorkflow, createStep } from '@mastra/core/workflows/vNext'
-import { z } from 'zod'
+const { createWorkflow, createStep } = init(
+  new Inngest({
+    id: 'mastra',
+    baseUrl: `http://localhost:8288`,
+  })
+)
 
 function getWeatherCondition(code: number): string {
   const conditions: Record<number, string> = {
@@ -141,15 +146,16 @@ const planIndoorActivities = createStep({
   outputSchema: z.object({
     activities: z.string(),
   }),
-  execute: async ({ inputData, mastra }) => {
+  execute: async ({ inputData, mastra, getInitData }) => {
     console.log('planIndoorActivities')
     const forecast = inputData
+    const { city } = getInitData<typeof weatherWorkflow>()
 
     if (!forecast) {
       throw new Error('Forecast data not found')
     }
 
-    const prompt = `In case it rains, plan indoor activities for ${forecast.location} on ${forecast.date}`
+    const prompt = `In case it rains, plan indoor activities for ${city} on ${forecast.date}`
 
     const agent = mastra?.getAgent('planningAgent')
     if (!agent) {

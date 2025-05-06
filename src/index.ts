@@ -26,18 +26,16 @@ const readInput = (): Promise<string> => {
 }
 
 // Example 1
-const workflow = mastra.vnext_getWorkflow('step1Workflow')
-const run = workflow.createRun()
-const result = await run.start({ inputData: { city: 'New York' } })
-console.dir(result, { depth: null })
-
-srv.close()
-
-// Example 2
-// const workflow = mastra.vnext_getWorkflow('step2Workflow')
-// const run = workflow.createRun({})
+// const workflow = mastra.vnext_getWorkflow('step1Workflow')
+// const run = workflow.createRun()
 // const result = await run.start({ inputData: { city: 'New York' } })
 // console.dir(result, { depth: null })
+
+// Example 2
+const workflow = mastra.vnext_getWorkflow('step2Workflow')
+const run = workflow.createRun({})
+const result = await run.start({ inputData: { city: 'New York' } })
+console.dir(result, { depth: null })
 
 // Example 3
 // const workflow = mastra.getNewWorkflow('step3Workflow')
@@ -94,3 +92,5 @@ srv.close()
 // const run = workflow.createRun({})
 // const result = await run.start({ inputData: { location: 'New York' } })
 // console.dir(result, { depth: null })
+
+srv.close()
