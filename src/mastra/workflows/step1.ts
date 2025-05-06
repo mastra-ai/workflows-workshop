@@ -1,5 +1,13 @@
-import { createWorkflow, createStep } from '@mastra/core/workflows/vNext'
+import { init } from '@mastra/inngest'
+import { Inngest } from 'inngest'
 import { z } from 'zod'
+
+const { createWorkflow, createStep } = init(
+  new Inngest({
+    id: 'mastra',
+    baseUrl: `http://localhost:8288`,
+  })
+)
 
 function getWeatherCondition(code: number): string {
   const conditions: Record<number, string> = {
