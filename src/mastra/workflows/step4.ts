@@ -1,6 +1,13 @@
-import { createWorkflow, createStep } from '@mastra/core/workflows/vNext'
-
+import { init } from '@mastra/inngest'
+import { Inngest } from 'inngest'
 import { z } from 'zod'
+
+const { createWorkflow, createStep } = init(
+  new Inngest({
+    id: 'mastra',
+    baseUrl: `http://localhost:8288`,
+  })
+)
 
 const generateSuggestionsStep = createStep({
   id: 'generate-suggestions',
@@ -11,7 +18,7 @@ const generateSuggestionsStep = createStep({
     suggestions: z.array(z.string()),
     vacationDescription: z.string(),
   }),
-  execute: async ({ inputData, mastra, container }) => {
+  execute: async ({ inputData, mastra }) => {
     if (!mastra) {
       throw new Error('Mastra is not initialized')
     }

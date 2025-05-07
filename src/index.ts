@@ -37,48 +37,48 @@ const readInput = (): Promise<string> => {
 // console.dir(result, { depth: null })
 
 // Example 3
-const workflow = mastra.vnext_getWorkflow('step3Workflow')
-const run = workflow.createRun({})
-const result = await run.start({ inputData: { city: 'New York' } })
-console.dir(result, { depth: null })
+// const workflow = mastra.vnext_getWorkflow('step3Workflow')
+// const run = workflow.createRun({})
+// const result = await run.start({ inputData: { city: 'New York' } })
+// console.dir(result, { depth: null })
 
 // Example 4
-// const workflow = mastra.vnext_getWorkflow('step4Workflow')
-// const run = workflow.createRun({})
-// const result = await run.start({
-//   inputData: { vacationDescription: 'I want to go to the beach' },
-// })
-// console.log('result', result)
-// const suggStep = result?.steps?.['generate-suggestions']
-// if (suggStep.status === 'success') {
-//   const suggestions = suggStep.output?.suggestions
-//   console.log(
-//     suggestions
-//       .map(({ location, description }) => `- ${location}: ${description}`)
-//       .join('\n')
-//   )
+const workflow = mastra.vnext_getWorkflow('step4Workflow')
+const run = workflow.createRun({})
+const result = await run.start({
+  inputData: { vacationDescription: 'I want to go to the beach' },
+})
+console.log('result', result)
+const suggStep = result?.steps?.['generate-suggestions']
+if (suggStep.status === 'success') {
+  const suggestions = suggStep.output?.suggestions
+  console.log(
+    suggestions
+      .map(({ location, description }) => `- ${location}: ${description}`)
+      .join('\n')
+  )
 
-//   const userInput = await readInput()
-//   console.log('Selected:', userInput)
+  const userInput = await readInput()
+  console.log('Selected:', userInput)
 
-//   console.log('resuming from', result, 'with', {
-//     inputData: {
-//       selection: userInput,
-//       vacationDescription: 'I want to go to the beach',
-//       suggestions: suggStep?.output?.suggestions,
-//     },
-//     step: humanInputStep,
-//   })
-//   const result2 = await run.resume({
-//     resumeData: {
-//       selection: userInput,
-//       vacationDescription: 'I want to go to the beach',
-//       suggestions: suggStep?.output?.suggestions,
-//     },
-//     step: humanInputStep,
-//   })
-//   console.dir(result2, { depth: null })
-// }
+  console.log('resuming from', result, 'with', {
+    inputData: {
+      selection: userInput,
+      vacationDescription: 'I want to go to the beach',
+      suggestions: suggStep?.output?.suggestions,
+    },
+    step: 'human-input',
+  })
+  const result2 = await run.resume({
+    resumeData: {
+      selection: userInput,
+      vacationDescription: 'I want to go to the beach',
+      suggestions: suggStep?.output?.suggestions,
+    },
+    step: 'human-input',
+  })
+  console.dir(result2, { depth: null })
+}
 
 // Example 5
 // const workflow = mastra.vnext_getWorkflow('step5Workflow')
