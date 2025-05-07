@@ -1,14 +1,23 @@
-import { createWorkflow, createStep } from '@mastra/core/workflows/vNext'
+import { init } from '@mastra/inngest'
+import { Inngest } from 'inngest'
+import { z } from 'zod'
+
+const { createWorkflow, createStep } = init(
+  new Inngest({
+    id: 'mastra',
+    baseUrl: `http://localhost:8288`,
+  })
+)
+
 import { weatherTool } from '../tools'
 import { weatherReporterAgent } from '../agents'
-import { z } from 'zod'
 
 const fetchWeather = createStep(weatherTool)
 const reportWeather = createStep(weatherReporterAgent)
 
 const weatherWorkflow = createWorkflow({
   steps: [fetchWeather, reportWeather],
-  id: 'weather-workflow-step1-single-day',
+  id: 'weather-workflow-step6',
   inputSchema: z.object({
     location: z.string().describe('The city to get the weather for'),
   }),
