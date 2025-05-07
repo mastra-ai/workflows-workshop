@@ -1,7 +1,13 @@
-import { Step, Workflow } from '@mastra/core/workflows'
+import { init } from '@mastra/inngest'
+import { Inngest } from 'inngest'
 import { z } from 'zod'
-import { activityPlannerAgent } from '../agents'
-import { createStep, createWorkflow } from '@mastra/core/workflows/vNext'
+
+const { createWorkflow, createStep } = init(
+  new Inngest({
+    id: 'mastra',
+    baseUrl: `http://localhost:8288`,
+  })
+)
 
 const forecastSchema = z.object({
   date: z.string(),
@@ -74,8 +80,6 @@ const planActivities = createStep({
     activities: z.string(),
   }),
   execute: async ({ inputData, mastra }) => {
-    console.log('mastra', mastra)
-    console.log('planActivities', inputData)
     const forecast = inputData
 
     if (!forecast) {

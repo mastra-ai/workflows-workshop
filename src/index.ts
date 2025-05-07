@@ -1,6 +1,5 @@
 import { mastra } from './mastra'
 import { createInterface } from 'readline'
-import { humanInputStep } from './mastra/workflows/step4'
 import { serve } from '@hono/node-server'
 import { createHonoServer } from '@mastra/deployer/server'
 
@@ -32,16 +31,16 @@ const readInput = (): Promise<string> => {
 // console.dir(result, { depth: null })
 
 // Example 2
-const workflow = mastra.vnext_getWorkflow('step2Workflow')
-const run = workflow.createRun({})
-const result = await run.start({ inputData: { city: 'New York' } })
-console.dir(result, { depth: null })
-
-// Example 3
-// const workflow = mastra.getNewWorkflow('step3Workflow')
+// const workflow = mastra.vnext_getWorkflow('step2Workflow')
 // const run = workflow.createRun({})
 // const result = await run.start({ inputData: { city: 'New York' } })
 // console.dir(result, { depth: null })
+
+// Example 3
+const workflow = mastra.vnext_getWorkflow('step3Workflow')
+const run = workflow.createRun({})
+const result = await run.start({ inputData: { city: 'New York' } })
+console.dir(result, { depth: null })
 
 // Example 4
 // const workflow = mastra.vnext_getWorkflow('step4Workflow')
