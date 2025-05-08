@@ -17,10 +17,13 @@ import { planningAgent } from './agents/planning'
 import { incrementWorkflow as step5Workflow } from './workflows/step5'
 import { researchAgent, factCheckAgent, editorAgent } from './agents/network'
 import { weatherWorkflow as step6Workflow } from './workflows/step6'
+import { realtimeMiddleware } from '@inngest/realtime'
 
 const inngest = new Inngest({
   id: 'mastra',
   baseUrl: `http://localhost:8288`,
+  isDev: true,
+  middleware: [realtimeMiddleware()],
 })
 
 export const mastra = new Mastra({
@@ -53,6 +56,7 @@ export const mastra = new Mastra({
     weatherReporterAgent,
   },
   server: {
+    host: '0.0.0.0',
     apiRoutes: [
       {
         path: '/inngest/api',

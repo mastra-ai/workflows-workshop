@@ -1,3 +1,4 @@
+import { realtimeMiddleware } from '@inngest/realtime'
 import { init } from '@mastra/inngest'
 import { Inngest } from 'inngest'
 import { z } from 'zod'
@@ -6,6 +7,8 @@ const { createWorkflow, createStep } = init(
   new Inngest({
     id: 'mastra',
     baseUrl: `http://localhost:8288`,
+    isDev: true,
+    middleware: [realtimeMiddleware()],
   })
 )
 
@@ -48,6 +51,7 @@ const fetchWeather = createStep({
   }),
   outputSchema: forecastSchema,
   execute: async ({ inputData }) => {
+    console.log('fetchWeather', inputData)
     if (!inputData) {
       throw new Error('Trigger data not found')
     }
@@ -102,6 +106,7 @@ const planActivities = createStep({
     activities: z.string(),
   }),
   execute: async ({ inputData, mastra }) => {
+    console.log('planActivities', inputData)
     const forecast = inputData
 
     if (!forecast) {
