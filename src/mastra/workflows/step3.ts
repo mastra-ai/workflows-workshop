@@ -271,7 +271,6 @@ const weatherWorkflow = createWorkflow({
       planActivities,
     ],
   ])
-
-weatherWorkflow.commit()
+  .commit()
 
 export { weatherWorkflow }

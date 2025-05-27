@@ -75,7 +75,6 @@ const workflow = createWorkflow({
     async ({ inputData }) => inputData.value >= 10
   )
   .then(finalStep)
-
-workflow.commit()
+  .commit()
 
 export { workflow as incrementWorkflow }
