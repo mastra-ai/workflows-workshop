@@ -2,7 +2,6 @@ import { Mastra } from '@mastra/core/mastra'
 import { serve } from '@mastra/inngest'
 import { realtimeMiddleware } from '@inngest/realtime'
 import { DefaultStorage } from '@mastra/libsql'
-import { createLogger } from '@mastra/core/logger'
 import { weatherWorkflow as step1Workflow } from './workflows/step1'
 import { weatherWorkflow as step2Workflow } from './workflows/step2'
 import { weatherWorkflow as step3Workflow } from './workflows/step3'
@@ -46,10 +45,6 @@ export const mastra = new Mastra({
     weatherReporterAgent,
   },
   storage,
-  logger: createLogger({
-    name: 'Mastra',
-    level: 'info',
-  }),
   server: {
     host: '0.0.0.0',
     apiRoutes: [
