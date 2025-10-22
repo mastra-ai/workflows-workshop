@@ -1,11 +1,11 @@
-import { createWorkflow, createStep } from "@mastra/core/workflows";
+import { createWorkflow, createStep } from '@mastra/core/workflows'
 
-import { z } from "zod";
+import { z } from 'zod'
 
 const generateSuggestionsStep = createStep({
-  id: "generate-suggestions",
+  id: 'generate-suggestions',
   inputSchema: z.object({
-    vacationDescription: z.string().describe("The description of the vacation"),
+    vacationDescription: z.string().describe('The description of the vacation'),
   }),
   outputSchema: z.object({
     suggestions: z.array(
@@ -16,11 +16,11 @@ const generateSuggestionsStep = createStep({
     ),
   }),
   execute: async ({ inputData, mastra }) => {
-    const { vacationDescription } = inputData;
-    const result = await mastra.getAgent("summaryTravelAgent").generateVNext(
+    const { vacationDescription } = inputData
+    const result = await mastra.getAgent('summaryTravelAgent').generate(
       [
         {
-          role: "user",
+          role: 'user',
           content: `Generate 3 suggestions for: ${vacationDescription}`,
         },
       ],
@@ -34,14 +34,14 @@ const generateSuggestionsStep = createStep({
           ),
         }),
       }
-    );
-    console.log(result.object);
-    return { suggestions: result.object?.suggestions || [] };
+    )
+    console.log(result.object)
+    return { suggestions: result.object?.suggestions || [] }
   },
-});
+})
 
 const humanInputStep = createStep({
-  id: "human-input",
+  id: 'human-input',
   inputSchema: z.object({
     suggestions: z.array(
       z.object({
@@ -51,10 +51,10 @@ const humanInputStep = createStep({
     ),
   }),
   outputSchema: z.object({
-    selection: z.string().describe("The selection of the user"),
+    selection: z.string().describe('The selection of the user'),
   }),
   resumeSchema: z.object({
-    selection: z.string().describe("The selection of the user"),
+    selection: z.string().describe('The selection of the user'),
   }),
   suspendSchema: z.object({
     suggestions: z.array(
@@ -66,45 +66,42 @@ const humanInputStep = createStep({
   }),
   execute: async ({ inputData, resumeData, suspend }) => {
     if (!resumeData?.selection) {
-      await suspend({ suggestions: inputData?.suggestions });
-      return {
-        selection: "",
-      };
+      return await suspend({ suggestions: inputData?.suggestions })
     }
 
     return {
       selection: resumeData?.selection,
-    };
+    }
   },
-});
+})
 
 const travelPlannerStep = createStep({
-  id: "travel-planner",
+  id: 'travel-planner',
   inputSchema: z.object({
-    selection: z.string().describe("The selection of the user"),
+    selection: z.string().describe('The selection of the user'),
   }),
   outputSchema: z.object({
     travelPlan: z.string(),
   }),
   execute: async ({ inputData, mastra, getInitData }) => {
-    const { vacationDescription } = getInitData();
+    const { vacationDescription } = getInitData()
 
-    const travelAgent = mastra.getAgent("travelAgent");
+    const travelAgent = mastra.getAgent('travelAgent')
 
-    const { selection } = inputData;
-    const result = await travelAgent.generateVNext([
-      { role: "assistant", content: vacationDescription },
-      { role: "user", content: selection || "" },
-    ]);
-    console.log(result.text);
-    return { travelPlan: result.text };
+    const { selection } = inputData
+    const result = await travelAgent.generate([
+      { role: 'assistant', content: vacationDescription },
+      { role: 'user', content: selection || '' },
+    ])
+    console.log(result.text)
+    return { travelPlan: result.text }
   },
-});
+})
 
 const travelAgentWorkflow = createWorkflow({
-  id: "travel-agent-workflow-step4-suspend-resume",
+  id: 'travel-agent-workflow-step4-suspend-resume',
   inputSchema: z.object({
-    vacationDescription: z.string().describe("The description of the vacation"),
+    vacationDescription: z.string().describe('The description of the vacation'),
   }),
   outputSchema: z.object({
     travelPlan: z.string(),
@@ -112,8 +109,8 @@ const travelAgentWorkflow = createWorkflow({
 })
   .then(generateSuggestionsStep)
   .then(humanInputStep)
-  .then(travelPlannerStep);
+  .then(travelPlannerStep)
 
-travelAgentWorkflow.commit();
+travelAgentWorkflow.commit()
 
-export { travelAgentWorkflow as weatherWorkflow, humanInputStep };
+export { travelAgentWorkflow as weatherWorkflow, humanInputStep }

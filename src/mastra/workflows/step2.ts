@@ -1,29 +1,29 @@
-import { Step, Workflow } from "@mastra/core/workflows";
-import { z } from "zod";
+import { Step, Workflow } from '@mastra/core/workflows'
+import { z } from 'zod'
 
-import { createWorkflow, createStep } from "@mastra/core";
-import { z } from "zod";
+import { createWorkflow, createStep } from '@mastra/core'
+import { z } from 'zod'
 
 function getWeatherCondition(code: number): string {
   const conditions: Record<number, string> = {
-    0: "Clear sky",
-    1: "Mainly clear",
-    2: "Partly cloudy",
-    3: "Overcast",
-    45: "Foggy",
-    48: "Depositing rime fog",
-    51: "Light drizzle",
-    53: "Moderate drizzle",
-    55: "Dense drizzle",
-    61: "Slight rain",
-    63: "Moderate rain",
-    65: "Heavy rain",
-    71: "Slight snow fall",
-    73: "Moderate snow fall",
-    75: "Heavy snow fall",
-    95: "Thunderstorm",
-  };
-  return conditions[code] || "Unknown";
+    0: 'Clear sky',
+    1: 'Mainly clear',
+    2: 'Partly cloudy',
+    3: 'Overcast',
+    45: 'Foggy',
+    48: 'Depositing rime fog',
+    51: 'Light drizzle',
+    53: 'Moderate drizzle',
+    55: 'Dense drizzle',
+    61: 'Slight rain',
+    63: 'Moderate rain',
+    65: 'Heavy rain',
+    71: 'Slight snow fall',
+    73: 'Moderate snow fall',
+    75: 'Heavy snow fall',
+    95: 'Thunderstorm',
+  }
+  return conditions[code] || 'Unknown'
 }
 
 const forecastSchema = z.object({
@@ -32,45 +32,45 @@ const forecastSchema = z.object({
   minTemp: z.number(),
   precipitationChance: z.number(),
   condition: z.string(),
-});
+})
 
 const fetchWeather = createStep({
-  id: "fetch-weather",
-  description: "Fetches weather forecast for a given city",
+  id: 'fetch-weather',
+  description: 'Fetches weather forecast for a given city',
   inputSchema: z.object({
     city: z.string(),
   }),
   outputSchema: forecastSchema,
   execute: async ({ inputData }) => {
     if (!inputData) {
-      throw new Error("Trigger data not found");
+      throw new Error('Trigger data not found')
     }
 
-    const geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(inputData.city)}&count=1`;
-    const geocodingResponse = await fetch(geocodingUrl);
+    const geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(inputData.city)}&count=1`
+    const geocodingResponse = await fetch(geocodingUrl)
     const geocodingData = (await geocodingResponse.json()) as {
-      results: { latitude: number; longitude: number; name: string }[];
-    };
+      results: { latitude: number; longitude: number; name: string }[]
+    }
 
     if (!geocodingData.results?.[0]) {
-      throw new Error(`Location '${inputData.city}' not found`);
+      throw new Error(`Location '${inputData.city}' not found`)
     }
 
-    const { latitude, longitude, name } = geocodingData.results[0];
+    const { latitude, longitude, name } = geocodingData.results[0]
 
-    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=precipitation,weathercode&timezone=auto,&hourly=precipitation_probability,temperature_2m`;
-    const response = await fetch(weatherUrl);
+    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=precipitation,weathercode&timezone=auto,&hourly=precipitation_probability,temperature_2m`
+    const response = await fetch(weatherUrl)
     const data = (await response.json()) as {
       current: {
-        time: string;
-        precipitation: number;
-        weathercode: number;
-      };
+        time: string
+        precipitation: number
+        weathercode: number
+      }
       hourly: {
-        precipitation_probability: number[];
-        temperature_2m: number[];
-      };
-    };
+        precipitation_probability: number[]
+        temperature_2m: number[]
+      }
+    }
 
     const forecast = {
       date: new Date().toISOString(),
@@ -81,90 +81,90 @@ const fetchWeather = createStep({
         (acc, curr) => Math.max(acc, curr),
         0
       ),
-    };
+    }
 
-    return forecast;
+    return forecast
   },
-});
+})
 
 const planActivities = createStep({
-  id: "plan-activities",
-  description: "Suggests activities based on weather conditions",
+  id: 'plan-activities',
+  description: 'Suggests activities based on weather conditions',
   inputSchema: forecastSchema,
   outputSchema: z.object({
     activities: z.string(),
   }),
   execute: async ({ getInitData, inputData, mastra }) => {
-    console.log("planActivities");
-    const forecast = inputData;
-    const { city } = getInitData<typeof weatherWorkflow>();
+    console.log('planActivities')
+    const forecast = inputData
+    const { city } = getInitData<typeof weatherWorkflow>()
 
     const prompt = `Based on the following weather forecast for ${city}, suggest appropriate activities:
       ${JSON.stringify(forecast, null, 2)}
-      `;
+      `
 
-    const agent = mastra.getAgent("planningAgent");
+    const agent = mastra.getAgent('planningAgent')
 
-    const response = await agent.streamVNext([
+    const response = await agent.stream([
       {
-        role: "user",
+        role: 'user',
         content: prompt,
       },
-    ]);
+    ])
 
-    let activitiesText = "";
+    let activitiesText = ''
 
     for await (const chunk of response.textStream) {
-      process.stdout.write(chunk);
-      activitiesText += chunk;
+      process.stdout.write(chunk)
+      activitiesText += chunk
     }
 
     return {
       activities: activitiesText,
-    };
+    }
   },
-});
+})
 
 const planIndoorActivities = createStep({
-  id: "plan-indoor-activities",
-  description: "Suggests indoor activities based on weather conditions",
+  id: 'plan-indoor-activities',
+  description: 'Suggests indoor activities based on weather conditions',
   inputSchema: forecastSchema,
   outputSchema: z.object({
     activities: z.string(),
   }),
   execute: async ({ getInitData, inputData, mastra }) => {
-    const { city } = getInitData();
-    console.log("planIndoorActivities");
-    const forecast = inputData;
+    const { city } = getInitData()
+    console.log('planIndoorActivities')
+    const forecast = inputData
 
-    const prompt = `In case it rains, plan indoor activities for ${city} on ${forecast.date}`;
+    const prompt = `In case it rains, plan indoor activities for ${city} on ${forecast.date}`
 
-    const agent = mastra.getAgent("planningAgent");
+    const agent = mastra.getAgent('planningAgent')
 
-    const response = await agent.streamVNext([
+    const response = await agent.stream([
       {
-        role: "user",
+        role: 'user',
         content: prompt,
       },
-    ]);
+    ])
 
-    let activitiesText = "";
+    let activitiesText = ''
 
     for await (const chunk of response.textStream) {
-      process.stdout.write(chunk);
-      activitiesText += chunk;
+      process.stdout.write(chunk)
+      activitiesText += chunk
     }
 
     return {
       activities: activitiesText,
-    };
+    }
   },
-});
+})
 
 const weatherWorkflow = createWorkflow({
-  id: "weather-workflow-step2-if-else",
+  id: 'weather-workflow-step2-if-else',
   inputSchema: z.object({
-    city: z.string().describe("The city to get the weather for"),
+    city: z.string().describe('The city to get the weather for'),
   }),
   outputSchema: z.object({
     activities: z.string(),
@@ -174,13 +174,13 @@ const weatherWorkflow = createWorkflow({
   .branch([
     [
       async ({ inputData }) => {
-        return inputData?.precipitationChance > 50;
+        return inputData?.precipitationChance > 50
       },
       planIndoorActivities,
     ],
     [
       async ({ inputData }) => {
-        return inputData?.precipitationChance <= 50;
+        return inputData?.precipitationChance <= 50
       },
       planActivities,
     ],
@@ -196,10 +196,10 @@ const weatherWorkflow = createWorkflow({
   .map({
     activities: {
       step: [planActivities, planIndoorActivities],
-      path: "activities",
+      path: 'activities',
     },
-  });
+  })
 
-weatherWorkflow.commit();
+weatherWorkflow.commit()
 
-export { weatherWorkflow };
+export { weatherWorkflow }
