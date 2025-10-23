@@ -1,7 +1,4 @@
-import { Step, Workflow } from '@mastra/core/workflows'
-import { z } from 'zod'
-
-import { createWorkflow, createStep } from '@mastra/core'
+import { createStep, createWorkflow } from '@mastra/core/workflows'
 import { z } from 'zod'
 
 function getWeatherCondition(code: number): string {
