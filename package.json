@@ -15,13 +15,13 @@
     "@ai-sdk/openai": "^2.0.22",
     "@hono/node-server": "1.19.0",
     "@inngest/realtime": "0.3.1",
-    "@mastra/core": "^0.21.1",
-    "@mastra/inngest": "^0.16.1",
-    "@mastra/libsql": "^0.15.2",
-    "@mastra/loggers": "^0.10.16",
+    "@mastra/core": "^0.22.2",
+    "@mastra/inngest": "^0.17.0",
+    "@mastra/libsql": "^0.16.0",
+    "@mastra/loggers": "^0.10.17",
     "dotenv": "17.2.1",
     "inngest": "3.40.1",
-    "mastra": "^0.11.2",
+    "mastra": "^0.17.3",
     "zod": "^4.1.4"
   },
   "devDependencies": {

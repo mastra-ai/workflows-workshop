@@ -138,7 +138,7 @@ const planIndoorActivities = createStep({
     console.log('planIndoorActivities', inputData)
     const forecast = inputData
 
-    const prompt = `In case it rains, plan indoor activities for ${city} on ${forecast.date}`
+    const prompt = `In case it rains, plan indoor activities for ${city} on ${forecast.date}. You don't need weather data, you know it's gonna rain.`
 
     const agent = mastra.getAgent('planningAgent')
 
